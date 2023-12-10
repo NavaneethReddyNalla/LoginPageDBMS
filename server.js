@@ -6,9 +6,10 @@ let users = { Navaneeth: "123456" };
 
 app.use(express.static("public"));
 app.use(express.urlencoded({ extended: true }));
+app.use("/login", express.static("public/loginpage.html"));
 
 app.get("/", (req, res) => {
-  res.status(200).redirect("/loginpage.html");
+  res.status(200).redirect("/login");
 });
 
 app.get("/users/:name", (req, res) => {
