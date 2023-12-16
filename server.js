@@ -12,8 +12,6 @@ const connection = mysql.createConnection({
 
 connection.connect();
 
-let users = { Navaneeth: "123456" };
-
 app.use(express.static("public"));
 app.use(express.urlencoded({ extended: true }));
 app.use("/login", express.static("public/loginpage.html"));
@@ -25,8 +23,13 @@ app.get("/", (req, res) => {
 
 app.get("/users/:name", (req, res) => {
   const name = req.params.name;
-  console.log(name);
-  res.status(200).send(JSON.stringify(users));
+
+  connection.query(
+    `select username, email from users where username='${name}'`,
+    (err, rows, fields) => {
+      res.send(`${rows[0].username}: ${rows[0].email}`);
+    }
+  );
 });
 
 app.post("/", (req, res) => {
