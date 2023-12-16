@@ -26,24 +26,43 @@ app.get("/", (req, res) => {
 app.get("/users/:name", (req, res) => {
   const name = req.params.name;
   console.log(name);
+  res.status(200).send(JSON.stringify(users));
 
-  if (name in users) {
-    res.status(200).send(JSON.stringify(users));
-  } else {
-    res.status(404).redirect("/");
-  }
+  // if (name in users) {
+  //   res.status(200).send(JSON.stringify(users));
+  // } else {
+  //   res.status(404).redirect("/");
+  // }
 });
 
 app.post("/", (req, res) => {
   const user = req.body.username;
   const pwd = req.body.password;
 
-  if (user in users && users[user] === pwd) {
-    res.redirect(`/users/${user}`);
-  } else {
-    console.log("Invalid!");
-    res.redirect("/");
-  }
+  connection.query(
+    `select password from users where username='${user}'`,
+    (err, rows, fields) => {
+      if (err) throw err;
+      console.log(rows);
+      if (rows.length == 0) {
+        console.log("Invalid username!");
+        res.redirect("/");
+      } else {
+        if (rows[0].password != pwd) {
+          console.log("Invalid Password");
+          res.redirect("/");
+        } else {
+          res.redirect(`/users/${user}`);
+        }
+      }
+    }
+  );
+  // if (user in users && users[user] === pwd) {
+  //   res.redirect(`/users/${user}`);
+  // } else {
+  //   console.log("Invalid!");
+  //   res.redirect("/");
+  // }
 });
 
 app.post("/createuser", (req, res) => {
