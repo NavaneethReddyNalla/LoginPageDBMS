@@ -1,6 +1,16 @@
 const express = require("express");
+const mysql = require("mysql");
 const app = express();
 const PORT = 5000;
+
+const connection = mysql.createConnection({
+  host: "localhost",
+  user: "root",
+  password: "",
+  database: "code_editor",
+});
+
+connection.connect();
 
 let users = { Navaneeth: "123456" };
 
