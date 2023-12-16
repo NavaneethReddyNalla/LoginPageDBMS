@@ -27,12 +27,6 @@ app.get("/users/:name", (req, res) => {
   const name = req.params.name;
   console.log(name);
   res.status(200).send(JSON.stringify(users));
-
-  // if (name in users) {
-  //   res.status(200).send(JSON.stringify(users));
-  // } else {
-  //   res.status(404).redirect("/");
-  // }
 });
 
 app.post("/", (req, res) => {
@@ -49,6 +43,7 @@ app.post("/", (req, res) => {
         res.redirect("/");
       } else {
         if (rows[0].password != pwd) {
+          console.log(rows[0].password, pwd);
           console.log("Invalid Password");
           res.redirect("/");
         } else {
@@ -57,12 +52,6 @@ app.post("/", (req, res) => {
       }
     }
   );
-  // if (user in users && users[user] === pwd) {
-  //   res.redirect(`/users/${user}`);
-  // } else {
-  //   console.log("Invalid!");
-  //   res.redirect("/");
-  // }
 });
 
 app.post("/createuser", (req, res) => {
@@ -70,13 +59,21 @@ app.post("/createuser", (req, res) => {
   const pwd = req.body.password;
   const email = req.body.email;
 
-  if (!(user in users)) {
-    users[user] = pwd;
-    res.redirect("/");
-  } else {
-    console.log("Username taken");
-    res.redirect("/signup.html");
-  }
+  connection.query(
+    `select username from users where username='${user}'`,
+    (err, rows, fields) => {
+      if (rows.length === 0) {
+        connection.query(
+          `insert into users values('${user}', '${email}', '${pwd}')`
+        );
+        console.log("Successful registration");
+        res.redirect("/");
+      } else {
+        console.log("Username already exists");
+        res.redirect("/signup");
+      }
+    }
+  );
 });
 
 app.listen(PORT, () => {
